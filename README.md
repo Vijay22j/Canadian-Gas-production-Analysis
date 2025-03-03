@@ -26,35 +26,33 @@ To analyze **monthly Canadian gas production** from **March 1990 to February 200
 
 ---
 
-## 🤖 **Project 2: Support Vector Machines for Purchase Prediction**  
+## 🏡 **Project 2: k-Nearest Neighbors (k-NN) for Boston Housing Prices**  
 
-**📄 File:** `Purchase Prediction.pdf`  
+**📄 File:** `Boston Housing Prices Prediction.pdf`  
 **📌 Objective:**  
-To classify **purchase behavior (FN vs. MM)** using **SVM models** and optimize the **hyperparameters** for better accuracy.
+To predict **housing prices** using a **k-NN regression model** and determine the **optimal value of k**.
 
 ### 🛠 **Data Preprocessing**  
-- Loaded the **juice2022.csv** dataset.  
-- Split the data into **training (90%)** and **test (10%)** sets using `createDataPartition()`.  
+- Partitioned the dataset into **training (80%)** and **testing (20%)** using `createDataPartition()`.  
+- Standardized the dataset using `preProcess()` (`center` and `scale` methods).  
 
-### 🔬 **Model Implementation**  
-- Fit an **initial SVM model** using a **linear kernel** (`svm()` function with cost = 0.01).  
-- Evaluated model performance using **accuracy, training error, and test error rates**.  
+### 🏗 **Model Implementation**  
+- Implemented **k-NN regression** using the `train()` function from the `caret` package.  
+- Used **10-fold cross-validation** to evaluate performance across different values of k (**1 to 18**).  
 
-### ⚙️ **Hyperparameter Tuning**  
-- Used the `tune()` function to find the **optimal cost value** in the range **0.01 to 10**.  
-- Found the **best cost parameter** that minimized **test error**.  
+### 📊 **Model Evaluation**  
+- Evaluated models using **RMSE, R-squared, and MAE**.  
+- Identified **k = 3** as the optimal value with the lowest **RMSE (0.482)**.  
+- Generated a plot to **visualize RMSE values** across different k values.  
 
-### 🔄 **Comparison of SVM Kernels**  
-- Tested models with **linear, radial, and polynomial kernels**.  
-- **Radial kernel performed best** with the lowest **test error rate (0.434)** after tuning.  
-- **Final Recommendation:** Use **radial kernel SVM with cost = 0.5**.  
-
+### 📌 **Final Findings**  
+- The **k-NN model with k = 3** provided the best trade-off between **bias and variance**. 
 ---
 
 ## 📌 **Technologies & Tools Used**  
 🔹 **R Programming**    
 🔹 Machine Learning & Statistical Modeling  
-
+🔹 k-nearest neighbors (k-NN) Algorithm
 ---
 
 ## 📌 **Packages**  
@@ -68,7 +66,6 @@ To classify **purchase behavior (FN vs. MM)** using **SVM models** and optimize 
 🔹 seasonal  
 🔹 corrplot  
 🔹 dplyr
-
 
 ---
 

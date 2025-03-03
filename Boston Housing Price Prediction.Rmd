@@ -1,0 +1,63 @@
+---
+title: "HW 3_Group 6_DSCI 5340"
+group members: Prasanth Gutha, Manasa Shivkar, Fahimeh Asgari, Vijay Ramaraju Jampana
+output:
+  pdf_document: default
+  html_document: default
+---
+## Loading the Packages
+```{r setup, include=TRUE}
+pacman::p_load(caret, data.table, ggplot2, FNN, MASS)
+knitr::opts_chunk$set(echo = TRUE, fig.width=12, fig.height=6)
+theme_set(theme_classic())
+options(digits = 3)
+```
+
+## 1.Using createDataPartition() function from the Caret package to partition the data into two parts – 80% into training data and 20% into test data.
+
+```{r datapartition}
+set.seed(42)
+partitionindex <- createDataPartition(y = Boston$medv, p = 0.8, list = FALSE)
+train_Boston <- Boston[partitionindex, ]
+test_Boston <- Boston[-partitionindex, ]
+```
+- The above chunk created data partition into two parts. training data set with 407 observation and 14 variables and the test data set with 99 observation and 14 variables.
+
+## 2.Using train() function from the Caret package, run a k-NN model with medv as the response or target variable with
+ ## a. Standardize the dataset using center and scale options in the preProcess() function in the Caret package
+```{r}
+set.seed(42)
+prep <- preProcess(train_Boston, method = c("center", "scale"))
+train_norm_Boston <- predict(prep, train_Boston)
+test_norm_Boston <- predict(prep, test_Boston)
+```
+ 
+ ## b. Use a 10-fold cross validation
+```{r knn classification}
+set.seed(42)
+kNN_model <- train(medv ~ .,
+                  data = train_norm_Boston,
+                  method = "knn",
+                  tuneGrid = data.frame(k = 1:18),
+                  preProcess = c("center", "scale"),
+                  trControl = trainControl(method = "cv", number = 10))
+kNN_model
+```
+
+## 3.Generate a plot showing model error RMSE against different values of k.
+```{r RMSE plot}
+ggplot(kNN_model$results, mapping = aes(x = k, y = RMSE)) + 
+  geom_point(colour = "black") + 
+  geom_line(colour = "purple") +
+  ggtitle("Model error RMSE against different values of k")
+```
+
+## 4.Choosing the optimal value of k and Explanation
+```{r optimal k}
+kNN_model$results
+kNN_model$bestTune
+```
+
+- RMSE was used to select the optimal model using the smallest value. Based on the results from the model, the smallest value is 0.482 when k = 3. We also used best Tune from the model which also suggest the optimal value at k = 3.
+
+

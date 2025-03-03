@@ -1,0 +1,112 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Loading the packages
+```{r}
+pacman ::p_load(dplyr, fpp3, seasonal)
+theme_set(theme_classic())
+tinytex::install_tinytex(force = TRUE)
+```
+
+```{r}
+library(fpp3)
+library(dplyr)
+```
+
+
+```{r}
+data_list <- data(package = "fpp3")$results[ ,"Item"]
+data_list
+```
+
+
+```{r}
+data(canadian_gas)
+```
+
+##Subsetting the data and keeping observations from March 1990 to February 2005
+```{r}
+gas_subset <- canadian_gas %>%
+  filter_index("1990 Mar" ~ "2005 Feb")%>%
+  select(c(Month, Volume))
+gas_subset
+```
+##Describing the dataset: Monthly Canadian gas production from March 1990 to February 2005 is included in the dataset. The measurement unit for gas production is billions of cubic meters.
+
+##Plotting the data using autoplot
+```{r}
+autoplot(gas_subset, color = "red") + 
+  labs(y = "Volume", x = "Year") + ggtitle("Canadian Gas Production from March 1990 to February 2005")
+```
+
+##Plotting the data using gg_subseries
+```{r}
+gg_subseries(gas_subset, color = "cyan") + labs(y = "Volume", x = "Year") + ggtitle("Seasonal Subseries")
+
+```
+
+##Plotting the data using gg_season
+```{r}
+gg_season(gas_subset) + labs(y = "Volume", x = "Year") + ggtitle("Seasonal")
+```
+##Presence of Seasonality: Seasonality is present in the dataset which can be seen particularly in plot 3, "Seasonal Time Series Plot of Canadian Gas Production. We see consistent drops in February, June, and September. This is also visible in plot 2, "Seasonal Subseries Plot of Canadian Gas Production," where the means (red lines in the chart) of these months dip lower on the y-axis.
+
+##Decomposition of data: 
+
+```{r}
+decomp<- gas_subset %>%
+  model(stl = STL(Volume))
+components(decomp) %>% autoplot() +
+  labs(title = "Decomposition of Canada's gas production data using the STL method")
+
+```
+
+##STL Decomposition
+
+```{r}
+components(decomp) %>% gg_season(season_year) + labs(y = "Volume", x = "Month") + ggtitle("Seasonal Component from STL decomposition")
+
+```
+##The seasonal shape remains consistent over time. The data follows a repetitive pattern of increase and decrease each year, with only minor deviations observed in the months of April to May.
+
+
+##plotting Seasonally-Adjusted series from the above decomposition: 
+
+```{r}
+gas_subset %>%
+  autoplot(Volume, color='green') +
+  autolayer(components(decomp), season_adjust, color='red') +
+  xlab("Month") + ylab("Volume") +
+  ggtitle("Canadian gas production - Seasonally Adjusted ")
+
+```
+##Compared to original series, the seasonally adjusted series exhibits lower deviation seasonally, in the production throughout the year
+
+  
+##X11 Decomposition
+
+```{r}
+x11_dcmp <- gas_subset |>
+  model(x11 = X_13ARIMA_SEATS(Volume ~ x11())) |>
+  components(x11_dcmp)
+autoplot(x11_dcmp) +
+  labs(title = "Canadian gas production decomposition using X-11.")
+```
+
+
+
+##SEATS decomposition
+
+```{r}
+seats_dcmp <- gas_subset |>
+  model(x11 = X_13ARIMA_SEATS(Volume ~ seats()))
+  components(seats_dcmp) |>
+autoplot() + 
+    labs(title = "Canadian gas production decomposition using SEATS")
+```
+## compared to decomposition using SEATS and X-11 decomposition methods, the results obtained using the STL decomposition is much smoother and exhibits lower deviation levels and similar trends & patterns. 
+
+         
